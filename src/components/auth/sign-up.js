@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import Card from '../UI/card';
+import Card from '../UI/Card/card';
 import { CircularProgress } from '@material-ui/core';
 import ErrorModal from '../UI/ErrorModal';
 
@@ -41,7 +41,7 @@ const SignUp = () => {
     if(!response.ok) {
       setIsLoading(false)
       console.log(response)
-      throw new Error('Failed to sign up')
+      throw new Error('Failed to sign up. Try again.')
     }
     const resData = await response.json()
     console.log(resData)
@@ -89,7 +89,5 @@ const SignUp = () => {
     </React.Fragment>
   );
 };
-
-//name, image, address, email, password
 
 export default SignUp;

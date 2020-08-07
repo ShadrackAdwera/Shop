@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Modal from './Modal';
+import Modal from './Modal/Modal';
 import Button from '@material-ui/core/Button';
 
 const ErrorModal = props => {

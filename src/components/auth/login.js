@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import Card from '../UI/card';
+import Card from '../UI/Card/card';
 import { NavLink } from 'react-router-dom';
 import { CircularProgress } from '@material-ui/core';
 import ErrorModal from '../UI/ErrorModal';
