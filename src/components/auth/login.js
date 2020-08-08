@@ -53,12 +53,11 @@ const LogIn = () => {
         },
         body: JSON.stringify(userInfo),
       });
-      if (!response.ok) {
-        throw new Error('Could not login');
-      }
       const resData = await response.json();
-      setIsLoading(false);
-      console.log(resData);
+      if (!response.ok) {
+          setIsLoading(false);
+          throw new Error(resData.error);
+      }
     } catch (error) {
       setError(error.message);
       setIsLoading(false);

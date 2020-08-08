@@ -67,13 +67,12 @@ const SignUp = () => {
         },
         body: JSON.stringify(requestBody),
       });
+      const resData = await response.json();
       if (!response.ok) {
         setIsLoading(false);
-        console.log(response);
-        throw new Error('Failed to sign up. Try again.');
+        dispatch({ type: 'RESET_FORM' });
+        throw new Error(resData.error);
       }
-      const resData = await response.json();
-      console.log(resData);
       setIsLoading(false);
       dispatch({ type: 'RESET_FORM' });
     } catch (error) {
