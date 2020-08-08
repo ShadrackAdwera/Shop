@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useReducer } from 'react';
 import { NavLink } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
@@ -16,76 +16,140 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const initialState = {
+  name: '',
+  image: '',
+  address: '',
+  email: '',
+  password: '',
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_NAME':
+      return { ...state, name: action.value };
+    case 'SET_IMAGE':
+      return { ...state, image: action.value };
+    case 'SET_ADDRESS':
+      return { ...state, address: action.value };
+    case 'SET_EMAIL':
+      return { ...state, email: action.value };
+    case 'SET_PASSWORD':
+      return { ...state, password: action.value };
+    case 'RESET_FORM':
+      return initialState;
+    default:
+      throw new Error('There ain no shit herr!');
+  }
+};
+
 const SignUp = () => {
   const classes = useStyles();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const [name, setName] = useState('')
-  const [image, setImage] = useState('')
-  const [address, setAddress] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [formState, dispatch] = useReducer(reducer, initialState);
 
   const signUp = async () => {
-    const requestBody = {name, image,address,email,password}
-    setIsLoading(true)
+    const requestBody = {
+      name: formState.name,
+      image: formState.image,
+      address: formState.address,
+      email: formState.email,
+      password: formState.password,
+    };
+    setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/users/sign-up',{
-      method: 'POST',
-      headers: {
-        'Content-Type':'application/json'
-      },
-      body: JSON.stringify(requestBody)
-    })
-    if(!response.ok) {
-      setIsLoading(false)
-      console.log(response)
-      throw new Error('Failed to sign up. Try again.')
-    }
-    const resData = await response.json()
-    console.log(resData)
-    setIsLoading(false)
-    setName('')
-    setImage('')
-    setAddress('')
-    setEmail('')
-    setPassword('')
+      const response = await fetch('http://localhost:5000/api/users/sign-up', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+      if (!response.ok) {
+        setIsLoading(false);
+        console.log(response);
+        throw new Error('Failed to sign up. Try again.');
+      }
+      const resData = await response.json();
+      console.log(resData);
+      setIsLoading(false);
+      dispatch({ type: 'RESET_FORM' });
     } catch (error) {
-      setIsLoading(false)
-      setError(error.message)
+      setIsLoading(false);
+      setError(error.message);
     }
-  }
+  };
 
   return (
     <React.Fragment>
-      <ErrorModal error={error} onClear={()=>setError(null)}/>
-    <Card className='authentication'>
-      <div className={classes.root}>
-      <h3>
-        <strong>Sign Up</strong>
-      </h3>
-      <br />
-      <TextField id="name" label="User Name" value={name} onChange={e=>setName(e.target.value)}/>
-      <br />
-      <TextField id="image" label="Image" value={image} onChange={e=>setImage(e.target.value)}/>
-      <br />
-      <TextField id="address" label="Address" value={address} onChange={e=>setAddress(e.target.value)}/>
-      <br />
-      <TextField id="email" label="Email" value={email} onChange={e=>setEmail(e.target.value)}/>
-      <br />
-      <TextField id="password" label="Password" type='password' value={password} onChange={e=>setPassword(e.target.value)}/>
-      <br />
-      <br/>
-      {isLoading? <CircularProgress/> : <Button variant="contained" color="primary" onClick={signUp}>
-        <strong>SUBMIT</strong>
-      </Button>}
-      <br/>
-      <br/>
-      <NavLink to='/'>Have an account? Login</NavLink>
-      
-    </div>
-    </Card>
+      <ErrorModal error={error} onClear={() => setError(null)} />
+      <Card className="authentication">
+        <div className={classes.root}>
+          <h3>
+            <strong>Sign Up</strong>
+          </h3>
+          <br />
+          <TextField
+            id="name"
+            label="User Name"
+            value={formState.name}
+            onChange={(e) =>
+              dispatch({ type: 'SET_NAME', value: e.target.value })
+            }
+          />
+          <br />
+          <TextField
+            id="image"
+            label="Image"
+            value={formState.image}
+            onChange={(e) =>
+              dispatch({ type: 'SET_IMAGE', value: e.target.value })
+            }
+          />
+          <br />
+          <TextField
+            id="address"
+            label="Address"
+            value={formState.address}
+            onChange={(e) =>
+              dispatch({ type: 'SET_ADDRESS', value: e.target.value })
+            }
+          />
+          <br />
+          <TextField
+            id="email"
+            label="Email"
+            value={formState.email}
+            onChange={(e) =>
+              dispatch({ type: 'SET_EMAIL', value: e.target.value })
+            }
+          />
+          <br />
+          <TextField
+            id="password"
+            label="Password"
+            type="password"
+            value={formState.password}
+            onChange={(e) =>
+              dispatch({ type: 'SET_PASSWORD', value: e.target.value })
+            }
+          />
+          <br />
+          <br />
+          {isLoading ? (
+            <CircularProgress />
+          ) : (
+            <Button variant="contained" color="primary" onClick={signUp}>
+              <strong>SUBMIT</strong>
+            </Button>
+          )}
+          <br />
+          <br />
+          <NavLink to="/">Have an account? Login</NavLink>
+        </div>
+      </Card>
     </React.Fragment>
   );
 };
