@@ -1,5 +1,5 @@
 import React, { useState, useReducer } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -47,8 +47,8 @@ const SignUp = () => {
   const classes = useStyles();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-
   const [formState, dispatch] = useReducer(reducer, initialState);
+  const history = useHistory()
 
   const signUp = async () => {
     const requestBody = {
@@ -68,13 +68,15 @@ const SignUp = () => {
         body: JSON.stringify(requestBody),
       });
       const resData = await response.json();
+      setIsLoading(false);
       if (!response.ok) {
         setIsLoading(false);
         dispatch({ type: 'RESET_FORM' });
         throw new Error(resData.error);
+      } else {
+        dispatch({ type: 'RESET_FORM' });
+        history.push('/users')
       }
-      setIsLoading(false);
-      dispatch({ type: 'RESET_FORM' });
     } catch (error) {
       setIsLoading(false);
       setError(error.message);

@@ -1,4 +1,5 @@
 import React, { useState, useReducer } from 'react';
+import { useHistory } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -36,11 +37,10 @@ const loginReducer = (state, action) => {
 
 const LogIn = () => {
   const classes = useStyles();
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('');
   const [formState, dispatch] = useReducer(loginReducer, initialState);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const history = useHistory()
 
   const logIn = async () => {
     const userInfo = { email: formState.email, password: formState.password };
@@ -54,15 +54,17 @@ const LogIn = () => {
         body: JSON.stringify(userInfo),
       });
       const resData = await response.json();
+      setIsLoading(false)
       if (!response.ok) {
           setIsLoading(false);
           throw new Error(resData.error);
+      } else {
+        history.push('/users')
       }
     } catch (error) {
       setError(error.message);
       setIsLoading(false);
     }
-    dispatch({ type: 'RESET_FORM' });
   };
 
   return (
