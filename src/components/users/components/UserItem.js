@@ -13,7 +13,7 @@ const UserItem = (props) => {
     <div>
       <li className="user-item">
           <Card className="user-item__content">
-            <Link to={`/users/${props.id}/places`}>
+            <Link to={`/users/${props.id}/products`}>
               <div className="user-item__image">
                 <Avi image={props.image} alt={props.name} />
               </div>
