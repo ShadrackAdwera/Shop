@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useContext } from 'react';
+import React, { useState, useReducer, useContext, useCallback } from 'react';
 import { NavLink, useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
@@ -6,6 +6,7 @@ import Button from '@material-ui/core/Button';
 import Card from '../UI/Card/card';
 import { CircularProgress } from '@material-ui/core';
 import { AuthContext } from '../../shared/auth-context'
+import ImagePicker from '../UI/Image/ImageUpload'
 import ErrorModal from '../UI/ErrorModal';
 
 const useStyles = makeStyles((theme) => ({
@@ -19,7 +20,11 @@ const useStyles = makeStyles((theme) => ({
 
 const initialState = {
   name: '',
-  image: '',
+  image: {
+    value: null,
+    isValid: false,
+    inputId: null
+  },
   address: '',
   email: '',
   password: '',
@@ -30,7 +35,7 @@ const reducer = (state, action) => {
     case 'SET_NAME':
       return { ...state, name: action.value };
     case 'SET_IMAGE':
-      return { ...state, image: action.value };
+      return { ...state, image: {...state.image, value: action.value, isValid: action.isValid, inputId: action.id} };
     case 'SET_ADDRESS':
       return { ...state, address: action.value };
     case 'SET_EMAIL':
@@ -86,6 +91,15 @@ const SignUp = () => {
     }
   };
 
+  const inputHandler = useCallback((id, value, isValid) => {
+    dispatch({
+      type: 'SET_IMAGE',
+      value: value,
+      isValid: isValid,
+      inputId: id,
+    });
+  }, []);
+
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={() => setError(null)} />
@@ -104,15 +118,8 @@ const SignUp = () => {
             }
           />
           <br />
-          <TextField
-            id="image"
-            label="Image"
-            value={formState.image}
-            onChange={(e) =>
-              dispatch({ type: 'SET_IMAGE', value: e.target.value })
-            }
-          />
-          <br />
+          <ImagePicker center id='image' onInput={inputHandler}/>
+          <br/>
           <TextField
             id="address"
             label="Address"

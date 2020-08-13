@@ -33,9 +33,9 @@ if(isLoggedIn) {
   </Switch>
 } else {
   routes = <Switch>
+  <Route exact path='/' component={Users} />
   <Route exact path='/login' component={Login} />
   <Route exact path='/sign-up' component={SignUp} />
-  <Route exact path='/' component={Users} />
   <Redirect to='/login'/>
 </Switch>
 }
