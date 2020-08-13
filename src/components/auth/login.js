@@ -1,12 +1,14 @@
-import React, { useState, useReducer } from 'react';
+import React, { useState, useReducer, useContext } from 'react';
 import { useHistory } from 'react-router-dom'
+import { NavLink } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import Card from '../UI/Card/card';
-import { NavLink } from 'react-router-dom';
 import { CircularProgress } from '@material-ui/core';
+import { AuthContext } from '../../shared/auth-context'
 import ErrorModal from '../UI/ErrorModal';
+import Card from '../UI/Card/card';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,6 +39,7 @@ const loginReducer = (state, action) => {
 
 const LogIn = () => {
   const classes = useStyles();
+  const auth = useContext(AuthContext)
   const [formState, dispatch] = useReducer(loginReducer, initialState);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -59,7 +62,8 @@ const LogIn = () => {
           setIsLoading(false);
           throw new Error(resData.error);
       } else {
-        history.push('/users')
+        auth.login()
+        history.push('/')
       }
     } catch (error) {
       setError(error.message);

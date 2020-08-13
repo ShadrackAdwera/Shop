@@ -142,7 +142,7 @@ const AddProduct = () => {
     const resData = await response.json()
     console.log(resData)
     setIsLoading(false)
-    history.push('/users')
+    history.push('/')
     } catch (error) {
       setIsLoading(false)
       setError(error.message)
@@ -296,7 +296,7 @@ const AddProduct = () => {
           )}
           <br />
           <br />
-          <NavLink to="/users">Go Bacc</NavLink>
+          <NavLink to="/">Go Bacc</NavLink>
         </div>
       </Card>
     </React.Fragment>

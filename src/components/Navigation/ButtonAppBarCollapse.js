@@ -10,7 +10,7 @@ const styles = theme => ({
       display: "none"
     },
     margin: "10px",
-    boxShadow: "none"
+    boxShadow: "none",
   }
 });
 

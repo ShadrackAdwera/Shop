@@ -1,10 +1,11 @@
-import React, { useState, useReducer } from 'react';
+import React, { useState, useReducer, useContext } from 'react';
 import { NavLink, useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Card from '../UI/Card/card';
 import { CircularProgress } from '@material-ui/core';
+import { AuthContext } from '../../shared/auth-context'
 import ErrorModal from '../UI/ErrorModal';
 
 const useStyles = makeStyles((theme) => ({
@@ -45,6 +46,7 @@ const reducer = (state, action) => {
 
 const SignUp = () => {
   const classes = useStyles();
+  const auth = useContext(AuthContext)
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [formState, dispatch] = useReducer(reducer, initialState);
@@ -75,7 +77,8 @@ const SignUp = () => {
         throw new Error(resData.error);
       } else {
         dispatch({ type: 'RESET_FORM' });
-        history.push('/users')
+        auth.login()
+        history.push('/')
       }
     } catch (error) {
       setIsLoading(false);
