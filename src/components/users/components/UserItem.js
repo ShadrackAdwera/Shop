@@ -15,7 +15,7 @@ const UserItem = (props) => {
           <Card className="user-item__content">
             <Link to={`/users/${props.id}/products`}>
               <div className="user-item__image">
-                <Avi image={props.image} alt={props.name} />
+                <Avi image={`http://localhost:5000/${props.image}`} alt={props.name} />
               </div>
               <div className="user-item__info">
                 <h2><strong>{props.name}</strong></h2>

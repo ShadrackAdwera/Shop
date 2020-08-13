@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     '& > *': {
       margin: theme.spacing(1),
-      width: '25ch',
+      width: '32ch',
     },
   },
 }));
@@ -57,22 +57,26 @@ const SignUp = () => {
   const [formState, dispatch] = useReducer(reducer, initialState);
   const history = useHistory()
 
+  // {
+  //   name: formState.name,
+  //   image: formState.image,
+  //   address: formState.address,
+  //   email: formState.email,
+  //   password: formState.password,
+  // };
+
   const signUp = async () => {
-    const requestBody = {
-      name: formState.name,
-      image: formState.image,
-      address: formState.address,
-      email: formState.email,
-      password: formState.password,
-    };
+    const formData = new FormData()
+    formData.append('name', formState.name)
+    formData.append('image', formState.image.value)
+    formData.append('address', formState.address)
+    formData.append('email', formState.email)
+    formData.append('password', formState.password)
     setIsLoading(true);
     try {
       const response = await fetch('http://localhost:5000/api/users/sign-up', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
+        body: formData,
       });
       const resData = await response.json();
       setIsLoading(false);
@@ -113,6 +117,7 @@ const SignUp = () => {
             id="name"
             label="User Name"
             value={formState.name}
+
             onChange={(e) =>
               dispatch({ type: 'SET_NAME', value: e.target.value })
             }
@@ -158,7 +163,9 @@ const SignUp = () => {
           )}
           <br />
           <br />
+          <div className='center'>
           <NavLink to="/">Have an account? Login</NavLink>
+          </div>
         </div>
       </Card>
     </React.Fragment>
