@@ -43,16 +43,12 @@ const MenuProps = {
 };
 
 const colors = ['black', 'white', 'brown', 'blue', 'maroon', 'yellow'];
+const sizes = ['37','38','39','40','41','42','43','44','45']
 
 const initialState = {
   name: '',
   description: '',
-  sizes: {
-    sm: 0,
-    md: 0,
-    lg: 0,
-    xl: 0,
-  },
+  sizes: [],
   colors: [],
   price: 0,
   creator: '',
@@ -79,14 +75,8 @@ const reducer = (state, action) => {
         ...state,
         imageUrls: { ...state.imageUrls, angleThree: action.value },
       };
-    case 'SET_SM_SIZE':
-      return { ...state, sizes: { ...state.sizes, sm: action.value } };
-    case 'SET_MD_SIZE':
-      return { ...state, sizes: { ...state.sizes, md: action.value } };
-    case 'SET_LG_SIZE':
-      return { ...state, sizes: { ...state.sizes, lg: action.value } };
-    case 'SET_XL_SIZE':
-      return { ...state, sizes: { ...state.sizes, xl: action.value } };
+    case 'SET_SIZES':
+      return { ...state, sizes: action.value };
     case 'SET_COLORS':
       return { ...state, colors: action.value };
     case 'SET_PRICE':
@@ -104,7 +94,6 @@ const AddProduct = () => {
   const classes = useStyles();
   const [formState, dispatch] = useReducer(reducer, initialState);
   const { isLoading, error, sendRequest, clearError } = useHttp() 
-  const [productColor, setProductColor] = useState([]);
   const [images, setImages] = useState('')
   //const history = useHistory()
 
@@ -116,9 +105,7 @@ const AddProduct = () => {
     for(const key of Object.keys(images)) {
       formData.append('images', images[key])
     }
-    for (const key of Object.keys(formState.sizes)) {
-      formData.append('sizes', formState.sizes[key])
-    }
+    formData.append('sizes',formState.sizes)
     formData.append('colors',formState.colors)
     formData.append('price',formState.price)
     formData.append('creator',formState.creator)
@@ -130,12 +117,6 @@ const AddProduct = () => {
     } catch (error) {
       console.log(error)
     }
-    
-  };
-
-  const handleChange = (event) => {
-    setProductColor(event.target.value);
-    dispatch({ type: 'SET_COLORS', value: event.target.value });
   };
 
   return (
@@ -166,65 +147,50 @@ const AddProduct = () => {
           />
           <br />
           <div>
-            <input type='file' multiple onChange={e=>setImages(e.target.files)}/>
+            <label htmlFor="file"> 4 Images (different angles) </label>
+            <br/>
+            <input type='file' name = 'file' id='file' multiple onChange={e=>setImages(e.target.files)}/>
           </div>
           <br />
-          <div>
-            <TextField
-              id="sizeSmall"
-              label="Size Small"
-              type="number"
-              min={0}
-              value={formState.sizes.sm}
-              onChange={(e) =>
-                dispatch({ type: 'SET_SM_SIZE', value: e.target.value })
-              }
-            />
-            <TextField
-              id="sizeMedium"
-              label="Size Medium"
-              type="number"
-              value={formState.sizes.md}
-              onChange={(e) =>
-                dispatch({ type: 'SET_MD_SIZE', value: e.target.value })
-              }
-            />
-            <TextField
-              id="sizeLarge"
-              label="Size Large"
-              type="number"
-              value={formState.sizes.lg}
-              onChange={(e) =>
-                dispatch({ type: 'SET_LG_SIZE', value: e.target.value })
-              }
-            />
-            <TextField
-              id="sizeXlarge"
-              label="Size x-large"
-              type="number"
-              value={formState.sizes.xl}
-              onChange={(e) =>
-                dispatch({ type: 'SET_XL_SIZE', value: e.target.value })
-              }
-            />
-          </div>
           <FormControl className={classes.formControl}>
             <InputLabel id="demo-mutiple-checkbox-label">
-              Chose colors
+              Sizes Available
+            </InputLabel>
+            <Select
+              labelId="sizes-label-id"
+              id="multiple-sizes"
+              multiple
+              value={formState.sizes}
+              onChange={(event)=>dispatch({ type: 'SET_SIZES', value: event.target.value })}
+              input={<Input />}
+              renderValue={(selected) => selected.join(', ')}
+              MenuProps={MenuProps}
+            >
+              {sizes.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={formState.sizes.indexOf(name) > -1} />
+                  <ListItemText primary={name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl className={classes.formControl}>
+            <InputLabel id="demo-mutiple-checkbox-label">
+              Colors Available
             </InputLabel>
             <Select
               labelId="demo-mutiple-checkbox-label"
               id="demo-mutiple-checkbox"
               multiple
-              value={productColor}
-              onChange={handleChange}
+              value={formState.colors}
+              onChange={(event)=>dispatch({ type: 'SET_COLORS', value: event.target.value })}
               input={<Input />}
               renderValue={(selected) => selected.join(', ')}
               MenuProps={MenuProps}
             >
               {colors.map((name) => (
                 <MenuItem key={name} value={name}>
-                  <Checkbox checked={productColor.indexOf(name) > -1} />
+                  <Checkbox checked={formState.colors.indexOf(name) > -1} />
                   <ListItemText primary={name} />
                 </MenuItem>
               ))}
