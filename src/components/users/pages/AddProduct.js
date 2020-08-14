@@ -1,5 +1,5 @@
 import React, { useReducer, useState } from 'react';
-import { NavLink, useHistory } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
@@ -11,9 +11,11 @@ import MenuItem from '@material-ui/core/MenuItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
-
 import { CircularProgress } from '@material-ui/core';
+
+
 import ErrorModal from '../../UI/ErrorModal';
+import { useHttp } from '../../../shared/http-hook'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -45,11 +47,6 @@ const colors = ['black', 'white', 'brown', 'blue', 'maroon', 'yellow'];
 const initialState = {
   name: '',
   description: '',
-  imageUrls: {
-    angleOne: '',
-    angleTwo: '',
-    angleThree: '',
-  },
   sizes: {
     sm: 0,
     md: 0,
@@ -106,46 +103,32 @@ const reducer = (state, action) => {
 const AddProduct = () => {
   const classes = useStyles();
   const [formState, dispatch] = useReducer(reducer, initialState);
-  const [error, setError] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  const { isLoading, error, sendRequest, clearError } = useHttp() 
   const [productColor, setProductColor] = useState([]);
-  const history = useHistory()
+  const [images, setImages] = useState('')
+  //const history = useHistory()
 
   const createProduct = async () => {
-    setIsLoading(true);
-    const newProduct = {
-      name: formState.name,
-      description: formState.description,
-      imageUrls: {
-        angleOne: formState.imageUrls.angleOne,
-        angleTwo: formState.imageUrls.angleTwo,
-        angleThree: formState.imageUrls.angleThree,
-      },
-      sizes: {
-        sm: formState.sizes.sm,
-        md:formState.sizes.md,
-        lg:formState.sizes.lg,
-        xl:formState.sizes.xl
-      },
-      colors: formState.colors,
-      price: formState.price,
-      creator: formState.creator
+    const url = 'http://localhost:5000/api/products/new'
+    const formData = new FormData()
+    formData.append('name', formState.name)
+    formData.append('description', formState.description)
+    for(const key of Object.keys(images)) {
+      formData.append('images', images[key])
     }
+    for (const key of Object.keys(formState.sizes)) {
+      formData.append('sizes', formState.sizes[key])
+    }
+    formData.append('colors',formState.colors)
+    formData.append('price',formState.price)
+    formData.append('creator',formState.creator)
+    for (const key of formData.entries()) {
+      console.log(key[0] + ', ' + key[1]);
+  }
     try {
-      const response = await fetch('http://localhost:5000/api/products/new', {
-      method:'POST',
-      body: JSON.stringify(newProduct),
-      headers: {
-        'Content-Type':'application/json'
-      }
-    })
-    const resData = await response.json()
-    console.log(resData)
-    setIsLoading(false)
-    history.push('/')
+      await sendRequest(url, 'POST', formData)
     } catch (error) {
-      setIsLoading(false)
-      setError(error.message)
+      console.log(error)
     }
     
   };
@@ -157,7 +140,7 @@ const AddProduct = () => {
 
   return (
     <React.Fragment>
-      <ErrorModal error={error} onClear={() => setError(null)} />
+      <ErrorModal error={error} onClear={clearError} />
       <Card className="authentication">
         <div className={classes.root}>
           <h3>
@@ -183,30 +166,7 @@ const AddProduct = () => {
           />
           <br />
           <div>
-            <TextField
-              id="imageOne"
-              label="Image Angle One"
-              value={formState.imageUrls.angleOne}
-              onChange={(e) =>
-                dispatch({ type: 'SET_IMAGE_ONE', value: e.target.value })
-              }
-            />
-            <TextField
-              id="imageTwo"
-              label="Image Angle Two"
-              value={formState.imageUrls.angleTwo}
-              onChange={(e) =>
-                dispatch({ type: 'SET_IMAGE_TWO', value: e.target.value })
-              }
-            />
-            <TextField
-              id="imageThree"
-              label="Image Angle Three"
-              value={formState.imageUrls.angleThree}
-              onChange={(e) =>
-                dispatch({ type: 'SET_IMAGE_THREE', value: e.target.value })
-              }
-            />
+            <input type='file' multiple onChange={e=>setImages(e.target.files)}/>
           </div>
           <br />
           <div>
@@ -223,6 +183,7 @@ const AddProduct = () => {
             <TextField
               id="sizeMedium"
               label="Size Medium"
+              type="number"
               value={formState.sizes.md}
               onChange={(e) =>
                 dispatch({ type: 'SET_MD_SIZE', value: e.target.value })
@@ -231,6 +192,7 @@ const AddProduct = () => {
             <TextField
               id="sizeLarge"
               label="Size Large"
+              type="number"
               value={formState.sizes.lg}
               onChange={(e) =>
                 dispatch({ type: 'SET_LG_SIZE', value: e.target.value })
@@ -239,6 +201,7 @@ const AddProduct = () => {
             <TextField
               id="sizeXlarge"
               label="Size x-large"
+              type="number"
               value={formState.sizes.xl}
               onChange={(e) =>
                 dispatch({ type: 'SET_XL_SIZE', value: e.target.value })
