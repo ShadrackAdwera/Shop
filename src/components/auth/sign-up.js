@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useContext, useCallback } from 'react';
+import React, { useReducer, useContext, useCallback } from 'react';
 import { NavLink, useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
@@ -8,6 +8,7 @@ import { CircularProgress } from '@material-ui/core';
 import { AuthContext } from '../../shared/auth-context'
 import ImagePicker from '../UI/Image/ImageUpload'
 import ErrorModal from '../UI/ErrorModal';
+import { useHttp } from '../../shared/http-hook'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -52,9 +53,8 @@ const reducer = (state, action) => {
 const SignUp = () => {
   const classes = useStyles();
   const auth = useContext(AuthContext)
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [formState, dispatch] = useReducer(reducer, initialState);
+  const { isLoading, error, sendRequest, clearError } = useHttp()
   const history = useHistory()
 
   // {
@@ -72,27 +72,15 @@ const SignUp = () => {
     formData.append('address', formState.address)
     formData.append('email', formState.email)
     formData.append('password', formState.password)
-    setIsLoading(true);
+    const url = 'http://localhost:5000/api/users/sign-up'
     try {
-      const response = await fetch('http://localhost:5000/api/users/sign-up', {
-        method: 'POST',
-        body: formData,
-      });
-      const resData = await response.json();
-      setIsLoading(false);
-      if (!response.ok) {
-        setIsLoading(false);
-        dispatch({ type: 'RESET_FORM' });
-        throw new Error(resData.error);
-      } else {
-        dispatch({ type: 'RESET_FORM' });
-        auth.login()
-        history.push('/')
-      }
+      await sendRequest(url, 'POST', formData)
+      auth.login()
+      history.push('/')
     } catch (error) {
-      setIsLoading(false);
-      setError(error.message);
+      
     }
+    
   };
 
   const inputHandler = useCallback((id, value, isValid) => {
@@ -106,7 +94,7 @@ const SignUp = () => {
 
   return (
     <React.Fragment>
-      <ErrorModal error={error} onClear={() => setError(null)} />
+      <ErrorModal error={error} onClear={clearError} />
       <Card className="authentication">
         <div className={classes.root}>
           <h3>
