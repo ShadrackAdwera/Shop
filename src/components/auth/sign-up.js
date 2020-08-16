@@ -74,8 +74,8 @@ const SignUp = () => {
     formData.append('password', formState.password)
     const url = 'http://localhost:5000/api/users/sign-up'
     try {
-      await sendRequest(url, 'POST', formData)
-      auth.login()
+      const resData = await sendRequest(url, 'POST', formData)
+      auth.login(resData.user.id, resData.user.token)
       history.push('/')
     } catch (error) {
       

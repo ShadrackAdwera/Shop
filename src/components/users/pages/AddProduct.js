@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from 'react';
+import React, { useReducer, useState, useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
@@ -16,6 +16,7 @@ import { CircularProgress } from '@material-ui/core';
 
 import ErrorModal from '../../UI/ErrorModal';
 import { useHttp } from '../../../shared/http-hook'
+import { AuthContext } from '../../../shared/auth-context'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -81,8 +82,8 @@ const reducer = (state, action) => {
       return { ...state, colors: action.value };
     case 'SET_PRICE':
       return { ...state, price: action.value };
-    case 'SET_CREATOR':
-      return { ...state, creator: action.value };
+    // case 'SET_CREATOR':
+    //   return { ...state, creator: action.value };
     case 'CLEAR_FORM':
       return initialState
     default:
@@ -95,6 +96,7 @@ const AddProduct = () => {
   const [formState, dispatch] = useReducer(reducer, initialState);
   const { isLoading, error, sendRequest, clearError } = useHttp() 
   const [images, setImages] = useState('')
+  const auth = useContext(AuthContext)
   //const history = useHistory()
 
   const createProduct = async () => {
@@ -108,12 +110,12 @@ const AddProduct = () => {
     formData.append('sizes',formState.sizes)
     formData.append('colors',formState.colors)
     formData.append('price',formState.price)
-    formData.append('creator',formState.creator)
-    for (const key of formData.entries()) {
-      console.log(key[0] + ', ' + key[1]);
-  }
+    formData.append('creator',auth.userId)
+  //   for (const key of formData.entries()) {
+  //     console.log(key[0] + ', ' + key[1]);
+  // }
     try {
-      await sendRequest(url, 'POST', formData)
+      await sendRequest(url, 'POST', formData, { Authorization: `Bearer ${auth.token}` })
     } catch (error) {
       console.log(error)
     }
@@ -148,6 +150,7 @@ const AddProduct = () => {
           <br />
           <div>
             <label htmlFor="file"> 4 Images (different angles) </label>
+            <br/>
             <br/>
             <input type='file' name = 'file' id='file' multiple onChange={e=>setImages(e.target.files)}/>
           </div>
@@ -205,7 +208,7 @@ const AddProduct = () => {
             }
           />
           <br />
-          <TextField
+          {/* <TextField
             id="creator"
             label="creator"
             type="creator"
@@ -214,7 +217,7 @@ const AddProduct = () => {
               dispatch({ type: 'SET_CREATOR', value: e.target.value })
             }
           />
-          <br />
+          <br /> */}
           <br />
           {isLoading ? (
             <CircularProgress />

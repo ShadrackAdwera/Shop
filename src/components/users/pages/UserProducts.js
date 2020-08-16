@@ -46,9 +46,7 @@ const UserProducts = () => {
     return (
       <Card className="authentication" key={prod.id}>
         {isLoading? <CircularProgress /> : <AliceCarousel autoPlay autoPlayInterval={3000}>
-          <img src={prod.imageUrls.angleOne} className="sliderimg" alt="" />
-          <img src={prod.imageUrls.angleOne} className="sliderimg" alt="" />
-          <img src={prod.imageUrls.angleOne} className="sliderimg" alt="" />
+          {prod.images.map((pd=><img key={pd} src={pd} className="sliderimg" alt="" />))}
         </AliceCarousel>}
         <div>
           <h2>{prod.name}</h2>

@@ -11,20 +11,22 @@ import './App.css';
 
 
 function App() {
+  const [userId, setUserId] = useState()
+  const [token, setToken] = useState()
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-
-  const login = useCallback(()=>{
-    setIsLoggedIn(true)
+  const login = useCallback((uid, authToken)=>{
+    setUserId(uid)
+    setToken(authToken)
   },[])
 
   const logout = useCallback(()=>{
-    setIsLoggedIn(false)
+    setUserId(null)
+    setToken(null)
   },[])
 
   let routes
 
-if(isLoggedIn) {
+if(token) {
   routes = <Switch>
         <Route exact path='/' component={Users} />
         <Route exact path='/users/product/new' component={AddProduct} />
@@ -41,7 +43,7 @@ if(isLoggedIn) {
 }
 
   return (
-    <AuthContext.Provider value={{isLoggedIn, login, logout}}>
+    <AuthContext.Provider value={{isLoggedIn: !!token,  userId, token ,login, logout}}>
       <React.Fragment>
       <ButtonAppBar />
       <main style={{marginTop:'12%'}}>

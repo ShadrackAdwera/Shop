@@ -39,7 +39,7 @@ const loginReducer = (state, action) => {
 };
 
 const LogIn = () => {
-  const classes = useStyles();
+  const classes = useStyles(); 
   const auth = useContext(AuthContext)
   const [formState, dispatch] = useReducer(loginReducer, initialState);
   const { isLoading, error, clearError, sendRequest } = useHttp()
@@ -49,8 +49,8 @@ const LogIn = () => {
     const url = 'http://localhost:5000/api/users/login'
     const userInfo = { email: formState.email, password: formState.password };
     try {
-      await sendRequest(url, 'POST', JSON.stringify(userInfo), {'Content-Type':'application/json'})
-      auth.login()
+      const resData = await sendRequest(url, 'POST', JSON.stringify(userInfo), {'Content-Type':'application/json'})
+      auth.login(resData.user.id, resData.user.token)
       history.push('/')
     } catch (error) {
       console.log(error)
